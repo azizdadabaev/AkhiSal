@@ -200,13 +200,14 @@ for i in range(MATCH_ROWS):
     f_.alignment = Alignment(horizontal="center")
 
 # one worked example, so the expected format is obvious
-examples = ["Халимжон", "ШУҲРАТЖОН АКА", "Abdulloh", "Баходир", "Davron Vahobov", "Нематжон"]
+examples = ["Бекмурод", "Алишер ака", "Abdulloh", "Баходир", "Даврон Ваҳобов", "Халимжон"]
 for i, ex in enumerate(examples):
     ws.cell(row=4 + i, column=1, value=ex)
 
 ws.cell(row=4, column=1).comment = Comment(
-    "Example rows - type over them. Row 3 of this set ('Abdulloh') deliberately "
-    "shows the ambiguous case: three CRM clients carry that name.", "AkhiSal toolkit")
+    "Example rows - type over them. Most are Cyrillic spellings of clients stored in "
+    "Latin, to show the two alphabets matching. 'Abdulloh' shows the ambiguous case "
+    "(three clients share it) and the last row shows a name not in the list.", "AkhiSal toolkit")
 ws.freeze_panes = "A4"
 ws.cell(row=MATCH_ROWS + 6, column=1,
         value="Matching is exact after normalising, not fuzzy: it forgives alphabet and capitalisation, "
