@@ -87,7 +87,7 @@ def title(ws, text, subtitle, span="A1:F1"):
 wb = Workbook()
 N_CLIENTS = len(CLIENTS)
 CLI_LAST = N_CLIENTS + 1               # clients occupy rows 2..51
-MATCH_ROWS = 60                        # editable rows on the matcher sheet
+MATCH_ROWS = 40                        # editable rows on the matcher sheet
 
 # ============================================================ 1. Start here
 ws = wb.active
@@ -168,8 +168,9 @@ ws.freeze_panes = "A4"
 ws = wb.create_sheet("Client Matcher")
 ws.sheet_view.showGridLines = False
 title(ws, "Client Matcher", "Type or paste names into the yellow column. Latin or Cyrillic, either works.", "A1:E1")
-header(ws, 3, ["Name as you have it", "Normalised", "Matching CRM client", "Phone", "Result"],
-       [30, 24, 30, 16, 42])
+header(ws, 3, ["Name as you have it", "Normalised", "Matching CRM client", "Phone",
+                "Result", "Matches"],
+       [30, 24, 30, 16, 42, 9])
 
 CR = f"'CRM Clients'!$D$4:$D${3+N_CLIENTS}"
 CN = f"'CRM Clients'!$A$4:$A${3+N_CLIENTS}"
@@ -185,15 +186,18 @@ for i in range(MATCH_ROWS):
         f'=IF($B{row}="","",IFERROR(INDEX({CN},MATCH($B{row},{CR},0)),"not found"))'))
     d = ws.cell(row=row, column=4, value=(
         f'=IF($B{row}="","",IFERROR(INDEX({CP},MATCH($B{row},{CR},0)),""))'))
+    # count once in its own column, then read it back three times - COUNTIF
+    # across the client list is what makes this sheet expensive
+    f_ = ws.cell(row=row, column=6, value=f'=IF($B{row}="","",COUNTIF({CR},$B{row}))')
     e = ws.cell(row=row, column=5, value=(
         f'=IF($B{row}="","",'
-        f'IF(COUNTIF({CR},$B{row})=0,"no match - new client, or a typo",'
-        f'IF(COUNTIF({CR},$B{row})>1,'
-        f'"CHECK PHONE - "&COUNTIF({CR},$B{row})&" clients share this name",'
+        f'IF($F{row}=0,"no match - new client, or a typo",'
+        f'IF($F{row}>1,"CHECK PHONE - "&$F{row}&" clients share this name",'
         f'"matched")))'))
     d.number_format = "@"
-    for cell in (b, c, d, e):
+    for cell in (b, c, d, e, f_):
         cell.font, cell.fill, cell.border = CALC, CALC_FILL, BOX
+    f_.alignment = Alignment(horizontal="center")
 
 # one worked example, so the expected format is obvious
 examples = ["Халимжон", "ШУҲРАТЖОН АКА", "Abdulloh", "Баходир", "Davron Vahobov", "Нематжон"]
@@ -216,7 +220,7 @@ ws.sheet_view.showGridLines = False
 title(ws, "Phone Cleaner", "Paste numbers however they are written. Out comes 998XXXXXXXXX.", "A1:D1")
 header(ws, 3, ["Number as you have it", "Digits only", "CRM format", "Result"], [30, 22, 22, 34])
 
-PHONE_ROWS = 40
+PHONE_ROWS = 30
 for i in range(PHONE_ROWS):
     row = 4 + i
     a = ws.cell(row=row, column=1)
@@ -323,15 +327,18 @@ header(ws, 3, ["Amount (UZS)", "In words"], [18, 92])
 # lookup tables, parked to the right and greyed out
 ONES = ["", "bir", "ikki", "uch", "to'rt", "besh", "olti", "yetti", "sakkiz", "to'qqiz"]
 TENS = ["", "", "yigirma", "o'ttiz", "qirq", "ellik", "oltmish", "yetmish", "sakson", "to'qson"]
-ws.cell(row=3, column=8, value="lookup tables - leave alone").font = NOTE
+ws.cell(row=3, column=13, value="lookup tables - leave alone").font = NOTE
 for i in range(10):
-    ws.cell(row=4 + i, column=8, value=i).font = NOTE
-    ws.cell(row=4 + i, column=9, value=ONES[i]).font = NOTE
-    ws.cell(row=4 + i, column=10, value=TENS[i]).font = NOTE
-ONES_R, TENS_R = "$I$4:$I$13", "$J$4:$J$13"
-ws.column_dimensions["H"].width = 6
-ws.column_dimensions["I"].width = 10
-ws.column_dimensions["J"].width = 10
+    ws.cell(row=4 + i, column=13, value=i).font = NOTE
+    ws.cell(row=4 + i, column=14, value=ONES[i]).font = NOTE
+    ws.cell(row=4 + i, column=15, value=TENS[i]).font = NOTE
+ONES_R, TENS_R = "$N$4:$N$13", "$O$4:$O$13"
+for _c, _w in (("D", 7), ("E", 7), ("F", 7), ("G", 7),
+               ("H", 14), ("I", 14), ("J", 14), ("K", 14),
+               ("M", 5), ("N", 10), ("O", 10)):
+    ws.column_dimensions[_c].width = _w
+ws.cell(row=3, column=4, value="working - the four digit groups, then their words").font = NOTE
+ws.merge_cells(start_row=3, start_column=4, end_row=3, end_column=11)
 
 def group_words(g):
     """Words for a 0-999 group expression `g`, using the ones/tens tables."""
@@ -345,23 +352,31 @@ def group_words(g):
         f'INDEX({ONES_R},{rem}+1)))))'
     )
 
-MONEY_ROWS = 25
+MONEY_ROWS = 20
 for i in range(MONEY_ROWS):
     row = 4 + i
     a = ws.cell(row=row, column=1)
     a.font, a.fill, a.border, a.number_format = INPUT, INPUT_FILL, BOX, "# ##0"
 
     n = f"INT($A{row})"
-    g_mlrd = f"INT({n}/1000000000)"
-    g_mln  = f"INT(MOD({n},1000000000)/1000000)"
-    g_ming = f"INT(MOD({n},1000000)/1000)"
-    g_unit = f"MOD({n},1000)"
+    # D..G hold the four digit groups, H..K their words. Splitting them out
+    # keeps each formula small and makes a wrong answer easy to trace.
+    for col, expr in ((4, f"INT({n}/1000000000)"),
+                      (5, f"INT(MOD({n},1000000000)/1000000)"),
+                      (6, f"INT(MOD({n},1000000)/1000)"),
+                      (7, f"MOD({n},1000)")):
+        c = ws.cell(row=row, column=col, value=f'=IF($A{row}="","",{expr})')
+        c.font, c.fill = NOTE, CALC_FILL
+    for col, src in ((8, "D"), (9, "E"), (10, "F"), (11, "G")):
+        c = ws.cell(row=row, column=col,
+                    value=f'=IF($A{row}="","",{group_words("$%s%d" % (src, row))})')
+        c.font, c.fill = NOTE, CALC_FILL
     body = (
         f'TRIM('
-        f'IF({g_mlrd}>0,{group_words(g_mlrd)}&" milliard ","")&'
-        f'IF({g_mln}>0,{group_words(g_mln)}&" million ","")&'
-        f'IF({g_ming}>0,{group_words(g_ming)}&" ming ","")&'
-        f'{group_words(g_unit)})&" so\'m"'
+        f'IF($D{row}>0,$H{row}&" milliard ","")&'
+        f'IF($E{row}>0,$I{row}&" million ","")&'
+        f'IF($F{row}>0,$J{row}&" ming ","")&'
+        f'$K{row})&" so\'m"'
     )
     b = ws.cell(row=row, column=2, value=(
         f'=IF($A{row}="","",IF({n}=0,"nol so\'m",{body}))'))
