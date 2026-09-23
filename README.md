@@ -43,6 +43,34 @@ add-ins, so none of them are subject to that policy.
 
 ---
 
+## Just open the workbook
+
+**[`AkhiSal-Tools.xlsx`](AkhiSal-Tools.xlsx)** is finished and needs no setup at all —
+no import, no macros to enable, no add-in. Open it and type in the yellow cells.
+
+| Sheet | What it does |
+|---|---|
+| **Start here** | The legend: yellow = you type, grey = a formula |
+| **Client Matcher** | Paste names in any spelling, Latin or Cyrillic, and get the matching CRM client, their phone, and a warning when several clients share the name |
+| **CRM Clients** | The reference list — 50 real clients, snapshot 2026-09-19. Paste a fresh export over it any time |
+| **Phone Cleaner** | Messy phone spellings in, `998XXXXXXXXX` out |
+| **Receivables** | Real unpaid orders, aged against today's date, bucketed 0-30 / 31-60 / 61-90 / 90+ |
+| **Money in Words** | `13 500 000` → `o'n uch million besh yuz ming so'm`, for invoices |
+
+It is built entirely from Excel-2007-era functions (`INDEX`, `MATCH`, `SUBSTITUTE`,
+`COUNTIF`, `SUMIFS`), so it works in any Excel version and every formula in it was
+verified by recalculation before shipping. Rebuild it with
+`python3 builder/build_workbook.py`.
+
+**The matcher matches on phone, not just name** — deliberately. The CRM has three
+clients called `Abdulloh`, three called `Davron` and two called `Baxodir`, so a
+name alone cannot identify anyone. The sheet says `CHECK PHONE` instead of
+guessing.
+
+The tiers below are for building *further* tools on top.
+
+---
+
 ## The three tiers, most to least capable
 
 Pick the first one your machine allows.
