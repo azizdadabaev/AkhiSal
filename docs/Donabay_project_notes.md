@@ -14,12 +14,12 @@ Weekly pay workbook for a filler-block plant. The crew is paid **per good block*
 | Rule | How it works |
 |---|---|
 | Pay base | Only good blocks are paid: `Good = Moulded − Broken`. `Paid blocks = Moulded − MAX(0, Broken − BreakAllow × Moulded)`. BreakAllow is currently 0%, so paid = good. |
-| Pay rate | Settings rate table: so'm per paid block, each rate with a start date. The rate in force on each day is looked up, so old weeks keep their old rate. Current rate: **500 so'm from 2026-09-21**. |
+| Pay rate | Settings rate table: so'm per paid block, each rate with a start date. The rate in force on each day is looked up, so old weeks keep their old rate. Current rate: **500 so'm from 2026-08-31**. |
 | Weekly pot | Sum of the week's daily pay values (paid blocks × rate). |
 | Split | Worker share = pot × (worker's days ÷ total crew-days). Attendance: `1` = full day, `0.5` = half day, empty = absent. |
 | Advances | Logged in the Cash Ledger as type **Advance** and taken off that week's pay. |
 | Debt | Pay never goes negative. If a worker owes money, TO PAY is 0 and the debt carries forward. At most **DebtCap** of a week's earnings (currently 100%) goes to paying back old debt. Note: Uzbek labour law caps wage deductions at 50% for formally employed staff. |
-| Weeks | Monday to Sunday. The first week starts **2026-09-21**. |
+| Weeks | Monday to Sunday. The first week starts **2026-08-31**. |
 | Mistakes | Never delete a ledger row. Add a **Correction** row with the opposite amount. |
 
 ## 2. Sheets (in tab order)
@@ -44,7 +44,7 @@ Weekly pay workbook for a filler-block plant. The crew is paid **per good block*
 
 ## 3. Current data (at handover)
 
-- **Workers:** W01 Davlatbek, W02 Xusanboy, W03 Oybek, W04 Abdurashid. All Active, joined 2026-09-21. W05–W12 are empty.
+- **Workers:** W01 Davlatbek, W02 Xusanboy, W03 Oybek, W04 Nomonjon (was mistyped as Abdurashid). All Active and working since at least 4 Sep; real joining dates still to be entered. W05–W12 are empty.
 - **Week of 2026-09-21** (as of 23 Sep): moulded 11,978, broken 121, good 11,857, pot 5,928,500 so'm, 24 crew-days, reject rate 1.0%.
 - **Advances:** Davlatbek 150,000 (21 Sep) and Xusanboy 500,000 (22 Sep), 650,000 in total. TO PAY for the crew was 5,278,500.
 - Checks: **ALL CHECKS OK**.
@@ -87,6 +87,8 @@ Weekly pay workbook for a filler-block plant. The crew is paid **per good block*
    - The Settings "expected bags" row and the `CementNorm` name.
    - The cement wording in the Checks warning.
 6. Added this Project Notes tab (24 Sep 2026).
+7. **Imported the old hand-kept sheet (24 Sep 2026).** The calendar now starts Mon 31 Aug: 4-18 Sep production and the Avans/Berdim cash went in as written. W04 was renamed to Nomonjon. Cells the owner must confirm are amber with a comment: unknown cash dates, three payments that disagree with the old sheet's Qoldi, joining dates, and 25-26 Sep entered in advance.
+   - The old 4-9 Sep pay period spans two Monday-Sunday weeks here, so it shows as two weeks on Weekly Pay. The running balances are the same.
 
 ## 6. Known quirks and lessons
 

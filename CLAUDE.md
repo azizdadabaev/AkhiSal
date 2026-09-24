@@ -17,6 +17,14 @@ business data.
   `builder/build_donabay.py` only reproduces the old v1 layout. v2 shifted
   every row down by one and added Home, a nav bar and Guide. The builder
   writes to `build/` so it can't overwrite the real file.
+- **openpyxl drops the Office add-in links on save**, including the Claude
+  for Excel add-in's. After every save, run
+  `python3 builder/keep_addins.py ORIGINAL.xlsx Donabay.xlsx` with a copy
+  taken before editing.
+- The calendar starts **Mon 31 Aug 2026** (moved back from 21 Sep to hold
+  the old hand-kept sheet; see `builder/import_history_2026_09.py`). Amber
+  cells with comments are waiting for the owner to confirm them. Don't
+  change their values unless asked.
 - Never save a workbook that was opened with `data_only=True`. That replaces
   every formula with its value.
 - Use classic Excel functions only: SUMIFS, SUMPRODUCT, INDEX/MATCH,
