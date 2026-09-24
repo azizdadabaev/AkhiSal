@@ -3,7 +3,14 @@
 Daily filler-block production and weekly crew pay for beam-and-block
 production — in one Excel file. No macros, no add-ins, nothing to install.
 
-**[`Donabay.xlsx`](Donabay.xlsx)** — open it and type in the yellow cells.
+**[`Donabay.xlsx`](Donabay.xlsx)** — open it on the **Home** sheet and type in the tinted cells.
+
+> **Current version: v2** (redesigned 24 Sep 2026): Home dashboard, navigation bar, Guide,
+> a copy-ready payday list, and no cement tracking. Its own handover notes, exported from
+> the workbook, are in [`docs/Donabay_project_notes.md`](docs/Donabay_project_notes.md) and
+> take precedence over this page wherever they differ. The pay rules below are unchanged.
+> The 197-check test suite covers the v1 layout; v2's figures were checked by hand against
+> the week of 21 Sep 2026.
 
 ---
 
@@ -87,7 +94,7 @@ carried into the next week, an overpayment, a correction, the 50% cap, the
 payslip's advance list and the ledger's warnings.
 
 ```
-python3 builder/build_donabay.py                      # Donabay.xlsx
+python3 builder/build_donabay.py                      # v1 layout, to build/
 python3 builder/build_donabay.py --demo T1.xlsx       # a filled test copy
 ```
 

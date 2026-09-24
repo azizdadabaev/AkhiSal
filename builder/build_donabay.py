@@ -2,7 +2,7 @@
 """
 Builds Donabay.xlsx - daily filler-block production log and weekly crew payroll.
 
-    python3 builder/build_donabay.py            # the clean workbook to use
+    python3 builder/build_donabay.py            # v1 layout -> build/Donabay-v1.xlsx
     python3 builder/build_donabay.py --demo OUT # a copy filled with test data
 
 How the money works
@@ -823,6 +823,10 @@ if __name__ == "__main__":
         cap = float(sys.argv[4]) if len(sys.argv) > 4 else None
         build(demo=True, week=week, cap=cap).save(out)
     else:
-        out = os.path.join(ROOT, "Donabay.xlsx")
+        # Donabay.xlsx in the repo root is the live v2 workbook with real data,
+        # redesigned outside this builder. This script only reproduces the v1
+        # layout, so it writes elsewhere and can never overwrite the real file.
+        os.makedirs(os.path.join(ROOT, "build"), exist_ok=True)
+        out = os.path.join(ROOT, "build", "Donabay-v1.xlsx")
         build().save(out)
     print("wrote", out)
